@@ -1,0 +1,168 @@
+---
+globs: *.ts,*.tsx
+---
+
+# Padrões TypeScript e React
+
+## Exports
+
+```typescript
+// ✅ Export nomeado (SEMPRE usar)
+export function useProdutos() {
+  /* ... */
+}
+export const ProdutoView = () => {
+  /* ... */
+};
+export interface Produto {
+  /* ... */
+}
+
+// ❌ Export default (EVITAR)
+export default function Component() {
+  /* ... */
+}
+```
+
+## Hooks
+
+### Estrutura de Hook de Dados
+
+```typescript
+// features/[feature]/hooks/use[Feature].ts
+export function useProdutos(options: UseProdutosOptions) {
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const buscarProdutos = useCallback(async (filtros) => {
+    setLoading(true);
+    const resultado = await ProdutoMock.buscar(filtros);
+    setProdutos(resultado.dados);
+    setLoading(false);
+  }, []);
+
+  return { produtos, loading, buscarProdutos };
+}
+```
+
+### Controller Pattern
+
+```typescript
+// features/[feature]/controllers/use[Feature]Controller.ts
+export function useProdutoFiltros() {
+  const [filtros, setFiltros] = useState<ProdutoFiltrosCompleto>({});
+
+  const definirFiltros = useCallback((novosFiltros) => {
+    setFiltros((prev) => ({ ...prev, ...novosFiltros }));
+  }, []);
+
+  const validarFiltros = useCallback((filtros) => {
+    return ProdutoFiltrosSchema.safeParse(filtros);
+  }, []);
+
+  return { filtros, definirFiltros, validarFiltros, limparFiltros };
+}
+```
+
+## Componentes
+
+### View Component Pattern
+
+```typescript
+// features/[feature]/components/[Feature]View.tsx
+export const ProdutoView: React.FC<ProdutoViewProps> = ({
+  onEdit,
+  onDelete,
+  onView,
+  onCreate,
+}) => {
+  // Controller para filtros
+  const { filtros, limparFiltros } = useProdutoFiltros();
+
+  // Hook para dados
+  const { produtos, loading } = useProdutos({ filtros });
+
+  return (
+    <div>
+      <ProdutoFiltrosComponent />
+      <ProdutoLista produtos={produtos} loading={loading} />
+    </div>
+  );
+};
+```
+
+### Componentes Filhos
+
+Agrupar componentes relacionados em subpasta:
+
+```
+components/
+└── ProdutoCard/
+    ├── ProdutoCard.tsx
+    ├── ProdutoCardHeader.tsx
+    └── ProdutoCardActions.tsx
+```
+
+## Formulários (React Hook Form + Zod)
+
+```typescript
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ProdutoSchema } from "../schemas/ProdutoSchema";
+
+const form = useForm({
+  resolver: zodResolver(ProdutoSchema),
+  defaultValues: {
+    /* ... */
+  },
+});
+```
+
+## Data Fetching (TanStack Query)
+
+```typescript
+// Para queries
+const { data: produtos, isLoading } = useQuery({
+  queryKey: ["produtos", filtros],
+  queryFn: () => ProdutoService.buscarProdutos(filtros),
+});
+
+// Para mutations
+const mutation = useMutation({
+  mutationFn: (novoProduto) => ProdutoService.criar(novoProduto),
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ["produtos"] }),
+});
+```
+
+## Interfaces e Schemas
+
+```typescript
+// Interface TypeScript (features/produto/interfaces/Produto.ts)
+export interface Produto {
+  id: string;
+  nome: string;
+  preco: number;
+  categoria: string;
+  status: string;
+}
+
+// Schema Zod (features/produto/schemas/ProdutoSchema.ts)
+import { z } from "zod";
+import { ProdutoCategoriaEnum } from "../enums/ProdutoCategoriaEnum";
+
+export const ProdutoSchema = z.object({
+  id: z.string().uuid(),
+  nome: z.string().min(2).max(100),
+  preco: z.number().positive(),
+  categoria: z.nativeEnum(ProdutoCategoriaEnum),
+});
+```
+
+## Type Imports
+
+Sempre use `type` import quando importar apenas tipos:
+
+```typescript
+import type { Produto } from "@/features/produto/interfaces/Produto";
+import { useProdutos } from "@/features/produto/hooks/useProdutos";
+```
