@@ -1,0 +1,66 @@
+---
+alwaysApply: true
+---
+
+# Convenções de Código e Arquitetura
+
+## Estrutura (feature-based)
+
+- `features/<feature>/{components,controllers,hooks,interfaces,schemas,enums,mocks,services}`
+- `app/<rota>/{page.tsx,loading.tsx,error.tsx}` (App Router)
+- `shared/{components,hooks,services}` para recursos multi-domínio
+- `libs/` integrações externas; `core/` utilitários base
+
+## Nomes e exports
+
+- Pastas: kebab-case (ex.: `produto`, `auth-js`)
+- Componentes: PascalCase.tsx (ex.: `ProdutoView.tsx`)
+- Hooks: camelCase.ts com prefixo `use` (ex.: `useProdutos.ts`)
+- Controllers: camelCase.ts com sufixo `Controller` (ex.: `useProdutoController.ts`)
+- Interfaces: PascalCase.ts (ex.: `Produto.ts`)
+- Schemas: PascalCase.ts + `Schema` (ex.: `ProdutoSchema.ts`)
+- Enums: PascalCase.ts + `Enum` (ex.: `ProdutoStatusEnum.ts`)
+- Services: PascalCase + pasta (ex.: `ExemploService/index.ts`)
+- Export: 1 por arquivo, evitar `default export`
+
+## React/Next.js
+
+- Páginas server por padrão; usar `"use client"` somente quando houver interação/estado do cliente
+- Separar View (UI) de Controller/Hook (lógica)
+- Navegação e rotas: App Router (links, metadata, error/loading)
+
+## Estado e Dados
+
+- Estado servidor/async: TanStack Query (queries e mutations)
+- Estado global: Zustand apenas quando necessário; documentar motivo
+- Formulários: React Hook Form + Zod (`zodResolver`), validando input e exibindo mensagens
+
+## HTTP e Services
+
+- Preferir Axios centralizado em `shared/services` quando multi-domínio
+- Services por feature em `features/<feature>/services/<NomeService>/index.ts`
+- Tipar solicitações e respostas; tratar erros e expor mensagens amigáveis
+
+## Tailwind/UI
+
+- Tailwind v4; adotar utilitárias e variantes com `cva` quando fizer sentido
+- Ícones: Lucide + React Icons
+- Tokens (se houver): mapear para CSS vars e consumir nas classes
+
+## TanStack Query
+
+- `queryKey` estável, p. ex.: `["produtos", filtros]`
+- Seletores leves; invalidar cache no sucesso de mutações
+- Considerar data inicial no server quando beneficia SEO/perf
+
+## Testes
+
+- Unit/Integração: Jest + Testing Library
+- Testar lógica (controllers/hooks) e componentes com interação
+- Mocks dentro de `features/<feature>/mocks`
+- Meta sugerida: 70%+ de cobertura (flexível por contexto)
+
+## Acessibilidade
+
+- Labels conectados, `aria-*` quando necessário, foco visível
+- Mensagens de erro/empty usando regiões anunciáveis (`aria-live`) quando aplicável

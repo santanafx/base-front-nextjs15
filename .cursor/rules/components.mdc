@@ -1,0 +1,49 @@
+---
+alwaysApply: true
+---
+
+# Guia de Componentes (View)
+
+## Princípios
+
+- Componentes de apresentação (dumb UI) — sem acoplamento direto a dados remotos
+- Props claras, tipadas e coesas; evitar props genéricas
+- Variantes com `class-variance-authority (cva)` quando fizer sentido
+- A11y: roles/aria, foco, teclas, leitura por screen reader
+
+## Estrutura
+
+- `features/<feature>/components/<Componente>/<Componente>.tsx`
+- Componentes filhos co-localizados na pasta do pai
+
+## Server vs Client
+
+- Interação/estado do cliente: `"use client"`
+- Evitar estado local pesado em server components; isolar fronteiras
+
+## Estilo
+
+- Tailwind v4 utilitário; tokens via CSS vars quando disponíveis
+- Ícones: Lucide/React Icons
+- Evitar CSS ad-hoc fora de tokens; padronizar espaçamentos/tipografia
+
+## Boas práticas
+
+- Nomear componentes pelo propósito (ex.: `ProdutoLista`, não `ListaGenerica`)
+- Componentizar trechos reutilizáveis e extrair lógica em hooks/controllers
+- Uma responsabilidade por componente; evitar componentes “deus”
+
+## Testes (Jest + RTL)
+
+- Renderização básica e estados (disabled/loading)
+- Interações (click, input, keyboard)
+- A11y básico: labels associados, `aria-*` e foco
+
+## Exemplo de estrutura
+
+```
+features/produto/components/ProdutoCard/
+├── ProdutoCard.tsx
+├── ProdutoCardHeader.tsx
+└── ProdutoCardActions.tsx
+```
