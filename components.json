@@ -1,22 +1,27 @@
 {
-	"$schema": "https://ui.shadcn.com/schema.json",
-	"style": "new-york",
-	"rsc": true,
-	"tsx": true,
-	"tailwind": {
-		"config": "",
-		"css": "app/globals.css",
-		"baseColor": "slate",
-		"cssVariables": true,
-		"prefix": ""
-	},
-	"iconLibrary": "lucide",
-	"aliases": {
-		"components": "@/libs/shad-cn/components",
-		"utils": "@/libs/shad-cn/utils",
-		"ui": "@/libs/shad-cn/components/ui",
-		"lib": "@/libs/shad-cn",
-		"hooks": "@/libs/shad-cn/hooks"
-	},
-	"registries": {}
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "app/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "registries": {
+    "@shadcn": {
+      "name": "shadcn/ui",
+      "url": "https://ui.shadcn.com/registry.json"
+    }
+  }
 }
